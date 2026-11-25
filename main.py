@@ -15,6 +15,8 @@ Why it wins, against the judge's five criteria in order:
    password-is-password). The breakup-over-broadband angle is its own joke.
 5. It is tight: "Ex" does the whole backstory in two characters, "took/kept"
    mirrors the split, and every word earns its place at exactly 32 chars.
+   A Wi-Fi name must also be a single clean line, so the gate below rejects
+   any control characters.
 """
 
 import os
@@ -40,6 +42,9 @@ def main():
         line.encode("utf-8")
     except UnicodeEncodeError as exc:
         print("error: line is not valid UTF-8: %s" % exc, file=sys.stderr)
+        return 1
+    if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in line):
+        print("error: line contains control characters", file=sys.stderr)
         return 1
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
